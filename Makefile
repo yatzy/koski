@@ -81,3 +81,6 @@ ifndef version
 endif
 great:
 again:
+
+source-to-image:
+	cleandist=$(cleandist) ./scripts/dish.sh local
