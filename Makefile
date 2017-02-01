@@ -83,4 +83,7 @@ great:
 again:
 
 source-to-image:
-	cleandist=$(cleandist) ./scripts/dish.sh local
+	mkdir -p target/webapp/WEB-INF
+	cp web/WEB-INF/web.xml target/webapp/WEB-INF
+	echo "todo" > target/webapp/buildversion.txt
+	mvn install -DskipTests=true
