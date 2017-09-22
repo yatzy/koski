@@ -9,7 +9,7 @@ import {
 import Text from '../Text.jsx'
 import ModalDialog from './ModalDialog.jsx'
 import {ift} from '../util'
-import {UusiPerusopetuksenOppiaineDropdown} from './UusiPerusopetuksenOppiaineDropdown.jsx'
+import {UusiAikuistenPerusopetuksenKurssiDropdown} from './UusiAikuistenPerusopetuksenKurssiDropdown.jsx'
 
 export const PerusopetuksenKurssitEditor = ({model}) => {
   let osasuoritukset = modelLookup(model, 'osasuoritukset')
@@ -47,7 +47,7 @@ const UusiPerusopetuksenKurssiPopup = ({resultCallback, toimipiste, uusiKurssinS
   let validP = selectedAtom
   return (<ModalDialog className="uusi-kurssi-modal" onDismiss={resultCallback} onSubmit={() => resultCallback(selectedAtom.get())} validP={validP} okTextKey="Lisää">
     <h2><Text name="Lisää kurssi"/></h2>
-    <span className="kurssi"><UusiPerusopetuksenOppiaineDropdown oppiaineenSuoritus={uusiKurssinSuoritus}
+    <span className="kurssi"><UusiAikuistenPerusopetuksenKurssiDropdown kurssinSuoritus={uusiKurssinSuoritus}
                                         selected={selectedAtom}
                                         resultCallback={(x) => selectedAtom.set(x)}
                                         organisaatioOid={toimipiste}
