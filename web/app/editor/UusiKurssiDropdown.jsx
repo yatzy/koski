@@ -10,7 +10,7 @@ import {completeWithFieldAlternatives} from './PerusopetuksenOppiaineRowEditor.j
 import {elementWithLoadingIndicator} from '../AjaxLoadingIndicator.jsx'
 import {t} from '../i18n'
 
-export const UusiAikuistenPerusopetuksenKurssiDropdown = ({suoritukset = [], organisaatioOid, kurssinSuoritus, selected = Bacon.constant(undefined), resultCallback, placeholder, enableFilter=true}) => {
+export const UusiKurssiDropdown = ({suoritukset = [], organisaatioOid, kurssinSuoritus, selected = Bacon.constant(undefined), resultCallback, placeholder, enableFilter=true}) => {
   if (!kurssinSuoritus || !kurssinSuoritus.context.edit) return null
   let käytössäolevatKoodiarvot = suoritukset.map(s => modelData(s, 'koulutusmoduuli.tunniste').koodiarvo)
   let kurssiModels = koulutusModuuliprototypes(kurssinSuoritus).filter(R.complement(isPaikallinen))
