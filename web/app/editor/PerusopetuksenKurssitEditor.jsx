@@ -13,11 +13,13 @@ import {UusiPerusopetuksenOppiaineDropdown} from './UusiPerusopetuksenOppiaineDr
 
 export const PerusopetuksenKurssitEditor = ({model}) => {
   let osasuoritukset = modelLookup(model, 'osasuoritukset')
+  if (!osasuoritukset) return null
   let kurssit = modelItems(osasuoritukset)
+  let kurssinSuoritusProto = createKurssinSuoritus(osasuoritukset)
   let showUusiKurssiAtom = Atom(false)
   let lisääKurssi = (kurssi) => {
     if (kurssi) {
-      var suoritusUudellaKurssilla = modelSet(createKurssinSuoritus(osasuoritukset), kurssi, 'koulutusmoduuli')
+      var suoritusUudellaKurssilla = modelSet(kurssinSuoritusProto, kurssi, 'koulutusmoduuli')
       ensureArrayKey(suoritusUudellaKurssilla)
       pushModel(suoritusUudellaKurssilla, model.context.changeBus)
     }
@@ -35,7 +37,7 @@ export const PerusopetuksenKurssitEditor = ({model}) => {
       model.context.edit && <a className="uusi-kurssi" onClick={() => showUusiKurssiAtom.set(true)}><Text name="Lisää kurssi"/></a>
     }
     {
-      ift(showUusiKurssiAtom, <UusiPerusopetuksenKurssiPopup resultCallback={lisääKurssi} toimipiste={modelData(model.context.toimipiste).oid} uusiKurssinSuoritus={createKurssinSuoritus(osasuoritukset)} />)
+      ift(showUusiKurssiAtom, <UusiPerusopetuksenKurssiPopup resultCallback={lisääKurssi} toimipiste={modelData(model.context.toimipiste).oid} uusiKurssinSuoritus={kurssinSuoritusProto} />)
     }
   </td></tr>)
 }
