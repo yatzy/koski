@@ -27,7 +27,7 @@ class KoskiStats(application: KoskiApplication) extends KoskiPulssi {
   def metriikka: JulkinenMetriikka = metrics.toPublic
   def oppijoidenMäärä: Int = perustiedotStats.henkilöCount.getOrElse(0)
   def käyttöoikeudet: KäyttöoikeusTilasto = {
-    val ryhmät = if (application.fixtureCreator.shouldUseFixtures) {
+    val ryhmät = if (!application.fixtureCreator.shouldUseFixtures) {
       import scalaz.concurrent.Task.gatherUnordered
       val client = KäyttöoikeusServiceClient(application.config)
 
