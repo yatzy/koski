@@ -1,5 +1,7 @@
 import 'whatwg-fetch'
 import 'es6-promise/auto'
+import 'core-js/es6/map'
+import 'core-js/es6/set'
 import './window-error-handler.js'
 import './polyfills/closest.js'
 if (!String.prototype.startsWith) {
@@ -159,6 +161,10 @@ if (typeof Object.assign != 'function') {
 
 Number.isNaN = Number.isNaN || function(value) {
   return typeof value === 'number' && isNaN(value)
+}
+
+Number.isInteger = Number.isInteger || function(value) {
+  return typeof value === 'number' && isFinite(value) && Math.floor(value) === value
 }
 
 if (!history.pushState) {
