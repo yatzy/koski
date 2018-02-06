@@ -10,7 +10,6 @@ object Henkilö {
   type Oid = String
   type Hetu = String
   def withOid(oid: String) = OidHenkilö(oid)
-  def apply(hetu: String, etunimet: String, kutsumanimi: String, sukunimi: String) = UusiHenkilö(hetu, etunimet, kutsumanimi, sukunimi)
   def isHenkilöOid(s: String) = s.matches("""1\.2\.246\.562\.24\.\d{11}""")
 }
 
@@ -38,12 +37,10 @@ case class TäydellisetHenkilötiedot(
   @KoodistoUri("maatjavaltiot2")
   kansalaisuus: Option[List[Koodistokoodiviite]]
 ) extends HenkilöWithOid with Henkilötiedot {
-  def vainHenkilötiedot = UusiHenkilö(hetu.getOrElse(""), etunimet, kutsumanimi, sukunimi)
   def toHenkilötiedotJaOid = HenkilötiedotJaOid(oid, hetu, etunimet, kutsumanimi, sukunimi)
 }
 
 case class TäydellisetHenkilötiedotWithMasterInfo(henkilö: TäydellisetHenkilötiedot, master: Option[TäydellisetHenkilötiedot]) extends HenkilöWithOid with Henkilötiedot {
-  def vainHenkilötiedot = henkilö.vainHenkilötiedot
   def oid = henkilö.oid
   def hetu = henkilö.hetu
   def toHenkilötiedotJaOid = henkilö.toHenkilötiedotJaOid

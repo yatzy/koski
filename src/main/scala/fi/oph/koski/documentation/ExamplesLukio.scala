@@ -283,7 +283,7 @@ object LukioExampleData {
 
   val hyväksytty = Some(List(LukionOppiaineenArviointi("S")))
 
-  val exampleHenkilö = MockOppijat.lukiolainen.vainHenkilötiedot
+  val exampleHenkilö = MockOppijat.lukiolainen.toHenkilötiedotJaOid
 
   val ylioppilastutkinto: Ylioppilastutkinto = Ylioppilastutkinto(perusteenDiaarinumero = Some("60/011/2015"))
 

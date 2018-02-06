@@ -84,7 +84,7 @@ class SisältyväOpiskeluoikeusSpec extends FreeSpec with Matchers with Opiskelu
      }
 
     "Kun sisältävän opiskeluoikeuden henkilötieto ei täsmää -> HTTP 400" in {
-      putOpiskeluoikeus(fixture.sisältyvä, henkilö = MockOppijat.eerola.vainHenkilötiedot) {
+      putOpiskeluoikeus(fixture.sisältyvä, henkilö = MockOppijat.eerola.toHenkilötiedotJaOid) {
         verifyResponseStatus(400, KoskiErrorCategory.badRequest.validation.sisältäväOpiskeluoikeus.henkilöTiedot())
       }
     }
