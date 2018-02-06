@@ -174,7 +174,8 @@ class Oppiainetaulukko extends React.Component {
     let { isExpandedP, setExpanded } = accumulateExpandedState({suoritukset, filter: s => expandableProperties(s).length > 0, component: this})
 
     let edit = model.context.edit
-    let showLaajuus = (!!suoritukset.find(s => modelData(s, 'koulutusmoduuli.laajuus')) && !edit && !pakolliset) || (edit && !pakolliset)
+    let uudenSuorituksenLaajuus = modelLookup(uusiOppiaineenSuoritus ? uusiOppiaineenSuoritus : createOppiaineenSuoritus(modelLookup(model, 'osasuoritukset')), 'koulutusmoduuli.laajuus')
+    let showLaajuus = !pakolliset && !!uudenSuorituksenLaajuus
     const showFootnotes = !edit && !R.isEmpty(footnoteDescriptions(suoritukset))
 
     let addOppiaine = oppiaine => {
