@@ -4,6 +4,6 @@ import fi.oph.koski.henkilo.MockOppijat
 import fi.oph.koski.schema._
 
 trait OpiskeluoikeusData[Oikeus <: Opiskeluoikeus] {
-  val defaultHenkilö = MockOppijat.eero.toHenkilötiedotJaOid
+  val defaultHenkilö = MockOppijat.eero.henkilö
   def defaultOpiskeluoikeus: Oikeus
 }
