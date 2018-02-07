@@ -20,7 +20,7 @@ import org.json4s.{JArray, JValue}
 
 object EditorModelBuilder {
   def buildModel(deserializationContext: ExtractionContext, value: AnyRef, editable: Boolean)(implicit user: KoskiSession, koodisto: KoodistoViitePalvelu, localizations: LocalizationRepository): EditorModel = {
-    implicit val context = ModelBuilderContext(deserializationContext, editable)
+    implicit val context = ModelBuilderContext(deserializationContext, editable = editable, invalidatable = editable)
     builder(deserializationContext.schemaFactory.createSchema(value.getClass.getName)).buildModelForObject(value, Nil)
   }
 
@@ -73,7 +73,9 @@ trait ModelBuilderWithData[T] extends EditorModelBuilder[T]{
 
 case class ModelBuilderContext(
   deserializationContext: ExtractionContext,
-  editable: Boolean, root: Boolean = true,
+  editable: Boolean,
+  invalidatable: Boolean,
+  root: Boolean = true,
   var prototypesRequested: SchemaSet = SchemaSet.empty,
   prototypesBeingCreated: SchemaSet = SchemaSet.empty)(implicit val user: KoskiSession, val koodisto: KoodistoViitePalvelu, val localizationRepository: LocalizationRepository) extends LocalizedHtml {
 }
@@ -239,7 +241,7 @@ case class ObjectModelBuilder(schema: ClassSchema)(implicit context: ModelBuilde
       case _ => None
     }
     context.prototypesRequested = context.prototypesRequested ++ objectContext.prototypesRequested
-    ObjectModel(classes(schema.fullClassName), properties, objectTitle, objectContext.editable, createRequestedPrototypes, metadata ++ schema.metadata)
+    ObjectModel(classes(schema.fullClassName), properties, objectTitle, editable = objectContext.editable, invalidatable = objectContext.invalidatable, createRequestedPrototypes, metadata ++ schema.metadata)
   }
 
   def buildPrototype(metadata: List[Metadata]) = {
@@ -247,7 +249,7 @@ case class ObjectModelBuilder(schema: ClassSchema)(implicit context: ModelBuilde
       val propertyPrototype = Prototypes.getPrototypePlaceholder(property.schema, property.metadata).get
       createModelProperty(property, propertyPrototype)
     }
-    ObjectModel(classes(schema.fullClassName), properties, title = None, true, createRequestedPrototypes, metadata ++ schema.metadata)
+    ObjectModel(classes(schema.fullClassName), properties, title = None, editable = true, invalidatable = true, createRequestedPrototypes, metadata ++ schema.metadata)
   }
 
   private def createModelProperty(obj: AnyRef, objectContext: ModelBuilderContext, property: Property): EditorProperty = {
@@ -331,20 +333,25 @@ case class ObjectModelBuilder(schema: ClassSchema)(implicit context: ModelBuilde
   def prototypeKey = sanitizeName(schema.simpleName)
 
   private def newContext(obj: AnyRef): ModelBuilderContext = {
-    def orgAccess = obj match {
+    val (orgWriteAccess, orgTiedonsiirronMitätöintiAccess) = obj match {
       case o: OrganisaatioonLiittyvä =>
         o.omistajaOrganisaatio match {
-          case Some(o) => context.user.hasWriteAccess(o.oid)
-          case None => true
+          case Some(o) => (context.user.hasWriteAccess(o.oid), context.user.hasTiedonsiirronMitätöintiAccess(o.oid))
+          case None => (true, false)
         }
-      case _ => true
+      case _ => (true, false)
     }
-    def lähdejärjestelmäAccess = obj match {
-      case o: Lähdejärjestelmällinen => o.lähdejärjestelmänId == None
-      case _ => true
+    def lähdejärjestelmällinen = obj match {
+      case o: Lähdejärjestelmällinen => o.lähdejärjestelmänId.nonEmpty
+      case _ => false
     }
-
-    context.copy(editable = context.editable && lähdejärjestelmäAccess && orgAccess, root = false, prototypesBeingCreated = SchemaSet.empty)(context.user, context.koodisto, context.localizationRepository)
+    val sisältääValmiitaSuorituksia = obj match {
+      case o: Opiskeluoikeus => o.suoritukset.exists(_.valmis) || o.suoritukset.exists(_.osasuoritukset.exists(_.exists(_.valmis)))
+      case _ => false
+    }
+    val editable = context.editable && !lähdejärjestelmällinen && orgWriteAccess
+    val invalidatable = context.invalidatable && (!lähdejärjestelmällinen || orgTiedonsiirronMitätöintiAccess) && !sisältääValmiitaSuorituksia
+    context.copy(editable = editable, invalidatable = invalidatable, root = false, prototypesBeingCreated = SchemaSet.empty)(context.user, context.koodisto, context.localizationRepository)
   }
 }
 
